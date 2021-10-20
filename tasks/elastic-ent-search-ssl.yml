@@ -1,0 +1,52 @@
+---
+
+- name: ensure certificate directory exists
+  become: yes
+  file:
+    dest: "{{ es_ssl_certificate_path }}"
+    state: directory
+    owner: "{{ es_user }}"
+    group: "{{ es_group }}"
+    mode: "750"
+
+- name: Upload SSL/TLS key and certificate
+  become: yes
+  copy:
+    src: "{{ item }}"
+    dest: "{{ es_ssl_certificate_path }}/{{ item | basename }}"
+    owner: "{{ es_user }}"
+    group: "{{ es_group }}"
+    mode: "640"
+  with_items:
+    - "{{ es_ssl_key }}"
+    - "{{ es_ssl_certificate }}"
+  when: es_ssl_key and es_ssl_certificate
+  notify: restart enterprise-search
+  register: copy_certificates
+
+- name: Upload Elasticsearch CA Certificate
+  become: yes
+  copy:
+    src: "{{ es_ssl_ca }}"
+    dest: "{{ es_ssl_certificate_path }}/{{ es_ssl_ca | basename }}"
+    owner: "{{ es_user }}"
+    group: "{{ es_group }}"
+    mode: "640"
+  when: es_ssl_ca and es_ssl_enabled
+  notify: restart enterprise-search
+  register: copy_es_cafile
+
+
+- name: Upload SSL/TLS keystore
+  become: yes
+  copy:
+    src: "{{ ent_search_ssl_keystore }}"
+    dest: "{{ es_ssl_certificate_path }}/{{ ent_search_ssl_keystore | basename }}"
+    owner: "{{ es_user }}"
+    group: "{{ es_group }}"
+    mode: "640"
+  when: ent_search_ssl_keystore and ent_search_ssl_enabled
+  notify:
+    - reload systemd configuration
+    - restart enterprise-search
+  register: copy_keystore
