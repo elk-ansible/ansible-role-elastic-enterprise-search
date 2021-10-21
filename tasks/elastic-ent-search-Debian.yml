@@ -4,7 +4,7 @@
     url: "{{es_repo_base}}/GPG-KEY-elasticsearch"
     state: present
 
-- name: Debian - Download elastic App-search from url
+- name: Debian - Download elastic Ent-search from url
   get_url: url={% if es_custom_package_url is defined %}{{ es_custom_package_url }}{% else %}{{ es_package_url }}-{{ es_version }}.deb{% endif %} dest=/tmp/elasticsearch-{{ es_version }}.deb validate_certs=no
   when: not es_use_repository
 

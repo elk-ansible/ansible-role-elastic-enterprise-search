@@ -4,7 +4,7 @@
     state: present
     key: "{{es_repo_base}}/GPG-KEY-elasticsearch"
 
-- name: RedHat - Install Elastic App-search from url
+- name: RedHat - Install Elastic Ent-search from url
   become: yes
   yum: name={% if es_custom_package_url is defined %}{{ es_custom_package_url }}{% else %}{{ es_package_url }}-{{ es_version }}.rpm{% endif %} state=present
   when: not es_use_repository
